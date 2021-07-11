@@ -1,20 +1,29 @@
 ﻿using System;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.System;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class HudOverrideSystemType : ISystemType, IActivatable
+    public class HudOverrideSystemType : SystemType, IActivatable
     {
-        public bool IsActive { get; private set; }
-
-        public void Serialize(IMessageWriter writer, bool initialState)
+        public HudOverrideSystemType(IGame game, IEventManager eventManager) : base(game, eventManager)
         {
-            throw new NotImplementedException();
         }
 
-        public void Deserialize(IMessageReader reader, bool initialState)
+        public bool IsActive { get; private set; }
+
+        public override void Deserialize(IMessageReader reader, bool initialState)
         {
-            IsActive = reader.ReadBoolean();
+            bool status = reader.ReadBoolean();
+
+            if (status != IsActive)
+            {
+                EventManager.CallAsync(new HudOverrideSystemEvent(Game, status));
+            }
+
+            IsActive = status;
         }
     }
 }
