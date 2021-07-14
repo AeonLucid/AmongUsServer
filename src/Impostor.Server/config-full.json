@@ -5,6 +5,10 @@
     "ListenIp": "0.0.0.0",
     "ListenPort": 22023
   },
+  "ConsoleInput": {
+    "Enabled": true,
+    "SusLine": true
+  },
   "AnnouncementsServer": {
     "Enabled": true,
     "ListenIp": "0.0.0.0",

@@ -11,6 +11,7 @@ using Impostor.Api.Utils;
 using Impostor.Hazel.Extensions;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
+using Impostor.Server.Input;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
@@ -108,13 +109,9 @@ namespace Impostor.Server
                 })
                 .ConfigureServices((host, services) =>
                 {
-                    var debug = host.Configuration
-                        .GetSection(DebugConfig.Section)
-                        .Get<DebugConfig>() ?? new DebugConfig();
-
-                    var redirector = host.Configuration
-                        .GetSection(ServerRedirectorConfig.Section)
-                        .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
+                    var consoleInput = host.Configuration
+                        .GetSection(ConsoleInputConfig.Section)
+                        .Get<ConsoleInputConfig>() ?? new ConsoleInputConfig();
 
                     var announcementsServer = host.Configuration
                         .GetSection(AnnouncementsServerConfig.Section)
@@ -124,16 +121,25 @@ namespace Impostor.Server
                         .GetSection(AuthServerConfig.Section)
                         .Get<AuthServerConfig>() ?? new AuthServerConfig();
 
+                    var redirector = host.Configuration
+                        .GetSection(ServerRedirectorConfig.Section)
+                        .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
+
+                    var debug = host.Configuration
+                        .GetSection(DebugConfig.Section)
+                        .Get<DebugConfig>() ?? new DebugConfig();
+
                     services.AddSingleton<ServerEnvironment>();
                     services.AddSingleton<IServerEnvironment>(p => p.GetRequiredService<ServerEnvironment>());
                     services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
 
-                    services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
-                    services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
+                    services.Configure<ConsoleInputConfig>(host.Configuration.GetSection(ConsoleInputConfig.Section));
                     services.Configure<AnnouncementsServerConfig>(host.Configuration.GetSection(AnnouncementsServerConfig.Section));
+                    services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<AuthServerConfig>(host.Configuration.GetSection(AuthServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
+                    services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
 
                     if (redirector.Enabled)
                     {
@@ -218,6 +224,11 @@ namespace Impostor.Server
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
+
+                    if (consoleInput.Enabled)
+                    {
+                        services.AddHostedService<ConsoleInputService>();
+                    }
 
                     if (announcementsServer.Enabled)
                     {
