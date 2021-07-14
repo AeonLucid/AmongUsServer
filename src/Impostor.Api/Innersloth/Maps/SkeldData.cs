@@ -65,6 +65,7 @@ namespace Impostor.Api.Innersloth.Maps
                 new SkeldTask(SkeldTask.Ids.ElectricalDivertPowerToNavigation, TaskTypes.DivertPower, TaskCategories.ShortTask),
                 new SkeldTask(SkeldTask.Ids.ElectricalDivertPowerToLowerEngine, TaskTypes.DivertPower, TaskCategories.ShortTask),
                 new SkeldTask(SkeldTask.Ids.ElectricalDivertPowerToSecurity, TaskTypes.DivertPower, TaskCategories.ShortTask),
+                new SkeldTask(SkeldTask.Ids.CleanVent, TaskTypes.VentCleaning, TaskCategories.ShortTask),
             };
 
             Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();

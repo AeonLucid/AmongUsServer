@@ -36,6 +36,7 @@ namespace Impostor.Api.Innersloth.Maps
             {
                 new AirshipTask(AirshipTask.Ids.ElectricalFixWiring, TaskTypes.FixWiring, TaskCategories.CommonTask),
                 new AirshipTask(AirshipTask.Ids.MeetingRoomEnterIDCode, TaskTypes.EnterIdCode, TaskCategories.CommonTask),
+                new AirshipTask(AirshipTask.Ids.ElectricalCalibrateDistributor, TaskTypes.CalibrateDistributor, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.ElectricalResetBreakers, TaskTypes.ResetBreakers, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.VaultRoomDownloadData, TaskTypes.UploadData, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.BrigDownloadData, TaskTypes.UploadData, TaskCategories.LongTask),
@@ -50,8 +51,9 @@ namespace Impostor.Api.Innersloth.Maps
                 new AirshipTask(AirshipTask.Ids.MainHallDevelopPhotos, TaskTypes.DevelopPhotos, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.CargoBayFuelEngines, TaskTypes.FuelEngines, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.SecurityRewindTapes, TaskTypes.RewindTapes, TaskCategories.LongTask),
+                new AirshipTask(AirshipTask.Ids.LoungeEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.LongTask),
+                new AirshipTask(AirshipTask.Ids.ShowersEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.VaultRoomPolishRuby, TaskTypes.PolishRuby, TaskCategories.ShortTask),
-                new AirshipTask(AirshipTask.Ids.ElectricalCalibrateDistributor, TaskTypes.CalibrateDistributor, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.CockpitStabilizeSteering, TaskTypes.StabilizeSteering, TaskCategories.ShortTask),
                 new AirshipTask(AirshipTask.Ids.ArmoryDownloadData, TaskTypes.UploadData, TaskCategories.LongTask),
                 new AirshipTask(AirshipTask.Ids.CockpitDownloadData, TaskTypes.UploadData, TaskCategories.LongTask),
@@ -74,6 +76,7 @@ namespace Impostor.Api.Innersloth.Maps
                 new AirshipTask(AirshipTask.Ids.MainHallDecontaminate, TaskTypes.Decontaminate, TaskCategories.ShortTask),
                 new AirshipTask(AirshipTask.Ids.KitchenMakeBurger, TaskTypes.MakeBurger, TaskCategories.ShortTask),
                 new AirshipTask(AirshipTask.Ids.ShowersFixShower, TaskTypes.FixShower, TaskCategories.ShortTask),
+                new AirshipTask(AirshipTask.Ids.CleanVent, TaskTypes.VentCleaning, TaskCategories.ShortTask),
             };
 
             Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();

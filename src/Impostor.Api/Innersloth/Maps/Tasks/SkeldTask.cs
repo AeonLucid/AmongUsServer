@@ -42,6 +42,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
             ElectricalDivertPowerToNavigation = 26,
             ElectricalDivertPowerToLowerEngine = 27,
             ElectricalDivertPowerToSecurity = 28,
+            CleanVent = 29,
         }
 
         public Ids Id { get; }

@@ -39,6 +39,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
             OfficeProcessData = 23,
             LaunchpadRunDiagnostics = 24,
             ReactorUnlockManifolds = 25,
+            CleanVent = 26,
         }
 
         public Ids Id { get; }

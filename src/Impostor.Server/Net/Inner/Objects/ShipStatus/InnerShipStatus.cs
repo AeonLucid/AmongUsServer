@@ -105,6 +105,12 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                     break;
                 }
 
+                case RpcCalls.UpdateSystem:
+                {
+                    Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sId, out var state, out var ventId);
+                    break;
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }

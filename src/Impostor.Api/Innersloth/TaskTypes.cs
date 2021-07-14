@@ -62,5 +62,6 @@ namespace Impostor.Api.Innersloth
         GetBiggolSword = 57,
         PutAwayRifles = 58,
         StopCharles = 59,
+        VentCleaning = 60,
     }
 }

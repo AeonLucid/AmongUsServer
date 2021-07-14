@@ -59,6 +59,7 @@ namespace Impostor.Api.Innersloth.Maps
                 new MiraTask(MiraTask.Ids.OfficeProcessData, TaskTypes.ProcessData, TaskCategories.ShortTask),
                 new MiraTask(MiraTask.Ids.LaunchpadRunDiagnostics, TaskTypes.RunDiagnostics, TaskCategories.LongTask),
                 new MiraTask(MiraTask.Ids.ReactorUnlockManifolds, TaskTypes.UnlockManifolds, TaskCategories.ShortTask),
+                new MiraTask(MiraTask.Ids.CleanVent, TaskTypes.VentCleaning, TaskCategories.ShortTask),
             };
 
             Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();

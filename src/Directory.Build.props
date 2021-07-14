@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>1.5.0</VersionPrefix>
+    <VersionPrefix>1.6.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <EnforceCodeStyleInBuild Condition="$(MSBuildProjectName)!='Hazel'">true</EnforceCodeStyleInBuild>
   </PropertyGroup>
