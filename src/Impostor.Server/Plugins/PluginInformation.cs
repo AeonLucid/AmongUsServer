@@ -6,7 +6,7 @@ using Impostor.Api.Plugins;
 
 namespace Impostor.Server.Plugins
 {
-    public class PluginInformation
+    public class PluginInformation : IPluginInformation
     {
         private readonly ImpostorPluginAttribute _attribute;
 

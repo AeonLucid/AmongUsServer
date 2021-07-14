@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Plugins;
@@ -13,20 +12,20 @@ namespace Impostor.Server.Plugins
     {
         private readonly ILogger<PluginLoaderService> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly List<PluginInformation> _plugins;
+        private readonly PluginManager _pluginManager;
 
-        public PluginLoaderService(ILogger<PluginLoaderService> logger, IServiceProvider serviceProvider, List<PluginInformation> plugins)
+        public PluginLoaderService(ILogger<PluginLoaderService> logger, IServiceProvider serviceProvider, PluginManager pluginManager)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _plugins = plugins;
+            _pluginManager = pluginManager;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Loading plugins.");
+            _logger.LogInformation("Enabling plugins.");
 
-            foreach (var plugin in _plugins)
+            foreach (var plugin in _pluginManager.Plugins)
             {
                 _logger.LogInformation("Enabling plugin {0}.", plugin);
 
@@ -38,10 +37,10 @@ namespace Impostor.Server.Plugins
             }
 
             _logger.LogInformation(
-                _plugins.Count == 1
-                    ? "Loaded {0} plugin."
-                    : "Loaded {0} plugins.",
-                _plugins.Count
+                _pluginManager.Plugins.Count == 1
+                    ? "Enabled {0} plugin."
+                    : "Enabled {0} plugins.",
+                _pluginManager.Plugins.Count
             );
         }
 
@@ -49,7 +48,7 @@ namespace Impostor.Server.Plugins
         {
             // Disable all plugins with a valid instance set.
             // In the case of a failed startup, some can be null.
-            foreach (var plugin in _plugins)
+            foreach (var plugin in _pluginManager.Plugins)
             {
                 if (plugin.Instance != null)
                 {
@@ -57,6 +56,7 @@ namespace Impostor.Server.Plugins
 
                     // Disable plugin.
                     await plugin.Instance.DisableAsync();
+                    plugin.Instance = null;
                 }
             }
         }

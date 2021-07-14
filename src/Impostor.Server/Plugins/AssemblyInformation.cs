@@ -8,16 +8,19 @@ namespace Impostor.Server.Plugins
     {
         private Assembly? _assembly;
 
-        public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin)
+        public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin, bool isDefaultAssembly)
         {
             AssemblyName = assemblyName;
             Path = path;
             IsPlugin = isPlugin;
+            IsDefaultAssembly = isDefaultAssembly;
         }
 
         public string Path { get; }
 
         public bool IsPlugin { get; }
+
+        public bool IsDefaultAssembly { get; }
 
         public AssemblyName AssemblyName { get; }
 

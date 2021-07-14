@@ -9,6 +9,8 @@ namespace Impostor.Server.Plugins
 
         bool IsPlugin { get; }
 
+        bool IsDefaultAssembly { get; }
+
         Assembly Load(AssemblyLoadContext context);
     }
 }

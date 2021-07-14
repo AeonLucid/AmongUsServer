@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Plugins;
 using Impostor.Api.Utils;
 using Impostor.Hazel.Extensions;
 using Impostor.Server.Config;
@@ -18,11 +21,13 @@ using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Plugins;
+using Impostor.Server.Plugins.Proxies;
 using Impostor.Server.Recorder;
 using Impostor.Server.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using Serilog.Events;
@@ -31,38 +36,16 @@ namespace Impostor.Server
 {
     internal static class Program
     {
-        private static int Main(string[] args)
+        private static async Task<int> Main(string[] args)
         {
-#if DEBUG
-            var logLevel = LogEventLevel.Debug;
-#else
-            var logLevel = LogEventLevel.Information;
-#endif
-
-            if (args.Contains("--verbose"))
-            {
-                logLevel = LogEventLevel.Verbose;
-            }
-            else if (args.Contains("--errors-only"))
-            {
-                logLevel = LogEventLevel.Error;
-            }
-
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-#if DEBUG
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
-#else
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-#endif
-                .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .CreateLogger();
+                .CreateBootstrapLogger();
 
             try
             {
                 Log.Information("Starting Impostor v{0}", DotnetUtils.Version);
-                CreateHostBuilder(args).Build().Run();
+                await CreateHostBuilder(args).RunConsoleAsync();
                 return 0;
             }
             catch (Exception ex)
@@ -76,25 +59,8 @@ namespace Impostor.Server
             }
         }
 
-        private static IConfiguration CreateConfiguration(string[] args)
-        {
-            var configurationBuilder = new ConfigurationBuilder();
-
-            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-            configurationBuilder.AddJsonFile("config.json", true);
-            configurationBuilder.AddJsonFile("config.Development.json", true);
-            configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
-            configurationBuilder.AddCommandLine(args);
-
-            return configurationBuilder.Build();
-        }
-
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var configuration = CreateConfiguration(args);
-            var pluginConfig = configuration.GetSection("PluginLoader")
-                .Get<PluginConfig>() ?? new PluginConfig();
-
             return Host.CreateDefaultBuilder(args)
                 .UseContentRoot(Directory.GetCurrentDirectory())
 #if DEBUG
@@ -104,7 +70,10 @@ namespace Impostor.Server
 #endif
                 .ConfigureAppConfiguration(builder =>
                 {
-                    builder.AddConfiguration(configuration);
+                    builder.AddJsonFile("config.json", true);
+                    builder.AddJsonFile("config.Development.json", true);
+                    builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+                    builder.AddCommandLine(args);
                 })
                 .ConfigureServices((host, services) =>
                 {
@@ -134,6 +103,7 @@ namespace Impostor.Server
                     services.Configure<AnnouncementsServerConfig>(host.Configuration.GetSection(AnnouncementsServerConfig.Section));
                     services.Configure<AuthServerConfig>(host.Configuration.GetSection(AuthServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
+                    services.Configure<PluginLoaderConfig>(host.Configuration.GetSection(PluginLoaderConfig.Section));
 
                     if (redirector.Enabled)
                     {
@@ -228,10 +198,53 @@ namespace Impostor.Server
                     {
                         services.AddHostedService<AuthService>();
                     }
+
+                    services.AddSingleton<PluginManager>();
+                    services.AddSingleton<IPluginManager>(p => p.GetRequiredService<PluginManager>());
+                    services.AddHostedService(p => p.GetRequiredService<PluginManager>());
                 })
-                .UseSerilog()
-                .UseConsoleLifetime()
-                .UsePluginLoader(pluginConfig);
+                .UseSerilog((context, loggerConfiguration) =>
+                {
+#if DEBUG
+                    var logLevel = LogEventLevel.Debug;
+#else
+                    var logLevel = LogEventLevel.Information;
+#endif
+
+                    if (args.Contains("--verbose"))
+                    {
+                        logLevel = LogEventLevel.Verbose;
+                    }
+                    else if (args.Contains("--errors-only"))
+                    {
+                        logLevel = LogEventLevel.Error;
+                    }
+
+                    loggerConfiguration
+                        .MinimumLevel.Is(logLevel)
+#if DEBUG
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
+#else
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+#endif
+                        .Enrich.FromLogContext()
+                        .WriteTo.Console()
+                        .ReadFrom.Configuration(context.Configuration);
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddTransient(serviceProvider => serviceProvider.GetRequiredService<PluginManager>().CurrentHost?.Services.GetServices<IEventListener>() ?? Enumerable.Empty<IEventListener>());
+
+                    var apiAssembly = typeof(IPlugin).Assembly;
+                    var serilogAssembly = typeof(Serilog.ILogger).Assembly;
+
+                    services.AddSingleton(new ServiceProxyCollection(
+                        services
+                            .Where(t => t.ServiceType.Assembly == apiAssembly || t.ServiceType.Assembly == serilogAssembly || t.ServiceType == typeof(PluginManager) || t.ServiceType == typeof(ILoggerFactory))
+                            .Select(t => new ServiceRegistration(t.ServiceType, t.Lifetime))
+                            .Distinct()
+                            .ToArray()));
+                });
         }
     }
 }

@@ -7,15 +7,18 @@ namespace Impostor.Server.Plugins
     {
         private readonly Assembly _assembly;
 
-        public LoadedAssemblyInformation(Assembly assembly)
+        public LoadedAssemblyInformation(Assembly assembly, bool isDefaultAssembly)
         {
             AssemblyName = assembly.GetName();
             _assembly = assembly;
+            IsDefaultAssembly = isDefaultAssembly;
         }
 
         public AssemblyName AssemblyName { get; }
 
         public bool IsPlugin => false;
+
+        public bool IsDefaultAssembly { get; }
 
         public Assembly Load(AssemblyLoadContext context)
         {
