@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Games
@@ -58,6 +59,15 @@ namespace Impostor.Api.Games
         /// </summary>
         /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
+
+        /// <summary>
+        ///     Sends a <see cref="GameOptionsData" /> to one player.
+        ///     This will desync the options to the players. Use it carfully.
+        /// </summary>
+        /// <param name="options">The <see cref="GameOptionsData" /> to send.</param>
+        /// <param name="player">The player to send the <see cref="GameOptionsData" /> to.</param>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
+        ValueTask SendSettingsToPlayerAsync(GameOptionsData options, IInnerPlayerControl player);
 
         /// <summary>
         ///     Sets game's privacy.

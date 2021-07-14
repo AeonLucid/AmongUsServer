@@ -250,5 +250,14 @@ namespace Impostor.Api.Innersloth
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
         }
+
+        /// <summary>
+        /// Create a shallow clone of the options.
+        /// </summary>
+        /// <returns>The cloned GameOptionsData.</returns>
+        public GameOptionsData Clone()
+        {
+            return (GameOptionsData)MemberwiseClone();
+        }
     }
 }
